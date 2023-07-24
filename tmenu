@@ -1,0 +1,113 @@
+#!/bin/bash
+
+while true; do
+    clear
+    echo "========= TMUX MENU ========="
+    echo "1. Connect to a tmux session"
+    echo "2. Create a new tmux session"
+    echo "3. Kill a tmux session"
+    echo "4. Rename a tmux session"
+    echo "5. Quit"
+
+    read -rp "Enter your choice: " choice
+
+    case $choice in
+        1)
+            # Connect
+            clear
+            echo "========= TMUX MENU ========="
+            echo "---------- Connect ----------"
+            echo "Choose a tmux session to connect to:"
+            tmux list-sessions | awk '{print NR ". " $1}'
+            echo "0. Go back to the previous menu"
+
+            read -rp "Enter the number of the session to connect to: " connect_session_number
+            if [ "$connect_session_number" -eq 0 ]; then
+                continue
+            fi
+
+            connect_session_name=$(tmux list-sessions | awk NR=="$connect_session_number"'{print $1}')
+            tmux attach-session -t "${connect_session_name}"
+            read -rp "Press Enter to continue..."
+            ;;
+        2)
+            # Create
+            clear
+            echo "========= TMUX MENU ========="
+            echo "----------- Create ----------"
+            read -rp "Enter the session name (leave empty for default name): " session_name
+            if [ "$session_name" = "" ]; then
+                tmux new-session
+            else
+                tmux new-session -s "${session_name}"
+            fi
+            read -rp "Press Enter to continue..."
+            ;;
+        3)
+            # Kill
+            clear
+            echo "========= TMUX MENU ========="
+            echo "------------ Kill -----------"
+            echo "List of available tmux sessions:"
+            tmux list-sessions | awk '{print NR ". " $1}'
+            echo "0. Go back to the previous menu"
+
+            read -rp "Enter the number of the session to kill: " session_number
+            if [ "$session_number" -eq 0 ]; then
+                continue
+            fi
+
+            session_name=$(tmux list-sessions | awk NR=="$session_number"'{print $1}')
+            clear
+            echo "Are you shure you want to kill $session_name?"
+            read -rp "yes/no: " kill_choice
+            if [ "$kill_choice" = "yes" ]; then
+                tmux kill-session -t "${session_name}"
+            fi
+            read -rp "Press Enter to continue..."
+            ;;
+        4)
+            # Rename
+            clear
+            echo "========= TMUX MENU ========="
+            echo "----------- Rename ----------"
+            echo "List of available tmux sessions:"
+            tmux list-sessions | awk '{print NR ". " $1}'
+            echo "0. Go back to the previous menu"
+
+            read -rp "Enter the number of the session to rename: " session_number
+            if [ "$session_number" -eq 0 ]; then
+                continue
+            fi
+
+            session_name=$(tmux list-sessions | awk NR=="$session_number"'{print $1}')
+            read -rp "Enter the new session name (leave empty to keep the same name): " new_session_name
+
+            if [ -n "$new_session_name" ]; then
+                tmux rename-session -t "${session_name}" "${new_session_name}"
+                clear
+                echo "$session_name is now $new_session_name"
+            else
+                clear
+                echo "No Change"
+            fi
+            read -rp "Press Enter to continue..."
+            ;;
+        5)
+            # Bail
+            clear
+            echo "Bailing out"
+            exit 0
+            ;;
+        *)
+            # Fakeout
+            clear
+            echo "========= TMUX MENU ========="
+            echo "------------ 400 ------------"
+            echo "Invalid option. Please try again."
+            read -rp "Press Enter to continue..."
+            ;;
+    esac
+done
+
+
