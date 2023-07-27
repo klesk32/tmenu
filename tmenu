@@ -28,7 +28,6 @@ while true; do
 
             connect_session_name=$(tmux list-sessions | awk NR=="$connect_session_number"'{print $1}')
             tmux attach-session -t "${connect_session_name}"
-            read -rp "Press Enter to continue..."
             ;;
         2)
             # Create
@@ -41,7 +40,6 @@ while true; do
             else
                 tmux new-session -s "${session_name}"
             fi
-            read -rp "Press Enter to continue..."
             ;;
         3)
             # Kill
@@ -64,7 +62,6 @@ while true; do
             if [ "$kill_choice" = "yes" ]; then
                 tmux kill-session -t "${session_name}"
             fi
-            read -rp "Press Enter to continue..."
             ;;
         4)
             # Rename
